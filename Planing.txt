@@ -36,3 +36,18 @@ Financial literacy tips based on user behavior
 
 _____________________________________________________
 
+
+class ErrorHandler extends Error {
+    constructor(message, statusCode) {
+        super(message);
+        this.statusCode = statusCode
+        Error.captureStackTrace(this, this.constructor)
+    }
+}
+export default ErrorHandler
+
+** Standard error only provide error message thats why we create custom exception handler so that use status code as well.
+
+** this: It tells JavaScript to create a .stack property on the current object. 
+this.constructor: This is the "Filter." It tells JavaScript: "When you create the stack trace, do not include the ErrorHandler class itself in the list of function calls."
+
