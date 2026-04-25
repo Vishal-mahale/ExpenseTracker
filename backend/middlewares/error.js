@@ -21,7 +21,6 @@ const errorMiddleware = (err, req, res, next) => {
         err.message = `Json Web Token is invalid, Try again`;
         err.statusCode = 400;
     }
-
     return res.status(err.statusCode).json({
         success: false,
         message: err.message,

@@ -126,7 +126,6 @@ export const resetPassword = catchAsyncError(async (req, res, next) => {
     user.password = req.body.password;
     user.resetPasswordToken = undefined;
     user.resetPasswordExperies = undefined;
-    console.log(user);
     await user.save();
     sendToken(res, 200, user, "Password reset successfully");
 })

@@ -9,6 +9,8 @@ import cookieParser from "cookie-parser"
 import { connectDB } from "./database/database.js";
 import { cloudinaryConfig } from "./config/cloudinary.js";
 import userRouter from "./routes/userRoute.js"
+import transactionRouter from "./routes/transactionRoute.js"
+import dashboardRouter from "./routes/dashboardRoute.js"
 
 import errorMiddleware from "./middlewares/error.js"
 
@@ -22,6 +24,8 @@ cloudinaryConfig();
 
 
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/transaction", transactionRouter)
+app.use("/api/v1/dsahboard", dashboardRouter);
 
 //Middleware foor error handling.
 app.use(errorMiddleware)
