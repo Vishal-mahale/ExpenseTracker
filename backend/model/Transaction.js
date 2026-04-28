@@ -56,6 +56,10 @@ export const transactionSchema = new mongoose.Schema({
     account: {
         type: String   // Ex. HDFC,ICICI,
     },
+    attachment: {
+        type: String, // URL for receipt/invoice image
+        default: null
+    },
     date: {
         type: Date,
         default: Date.now(),
@@ -68,6 +72,10 @@ export const transactionSchema = new mongoose.Schema({
     tags: {
         type: [String]
     },
+    isBudgetAlert: {
+        type: Boolean,
+        default: false // Set to true if this transaction exceeded budget
+    },
     isReccuring: {
         type: Boolean,
         default: false
@@ -76,17 +84,29 @@ export const transactionSchema = new mongoose.Schema({
         type: String,
         enum: ["daily", "weekly", "monthly", "yearly"],
     },
+    recurringEndDate: {
+        type: Date,
+        default: null
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now
+    },
     isDeleted: {     // Soft Delete.Never delete data permanently.
         type: Boolean,
         default: false
     }
-
 }, { timestamps: true })
 
 
 transactionSchema.index({ user: 1, date: -1 })
 transactionSchema.index({ user: 1, category: 1 })
 transactionSchema.index({ user: 1, transactionType: 1 })
+transactionSchema.index({ user: 1, createdAt: -1 });
 
 const Transaction = mongoose.model("Transaction", transactionSchema)
 export default Transaction

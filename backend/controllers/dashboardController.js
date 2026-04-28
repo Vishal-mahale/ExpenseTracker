@@ -118,59 +118,106 @@ export const getRecentTransactions = catchAsyncError(async (req, res) => {
     });
 });
 
-// export const getTransactionSummary = catchAsyncError(async (req, res, next) => {
-//   const userId = req.user._id;
-//   const { period = "month" } = req.query; // month, week, year
+export const getTransactionSummary = catchAsyncError(async (req, res, next) => {
+    const userId = req.user._id;
+    const { period = "month" } = req.query; // month, week, year
 
-//   let startDate;
-//   const today = new Date();
+    let startDate;
+    const today = new Date();
 
-//   if (period === "week") {
-//     startDate = new Date(today.setDate(today.getDate() - 7));
-//   } else if (period === "month") {
-//     startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-//   } else if (period === "year") {
-//     startDate = new Date(today.getFullYear(), 0, 1);
-//   }
+    if (period === "week") {
+        startDate = new Date(today.setDate(today.getDate() - 7));
+    } else if (period === "month") {
+        startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    } else if (period === "year") {
+        startDate = new Date(today.getFullYear(), 0, 1);
+    }
 
-//   const transactions = await Transaction.find({
-//     user: userId,
-//     date: { $gte: startDate }
-//   });
+    const transactions = await Transaction.find({
+        user: userId,
+        date: { $gte: startDate }
+    });
 
-//   // Calculate summary
-//   const income = transactions
-//     .filter(t => t.transactionType === "income")
-//     .reduce((sum, t) => sum + t.amount, 0);
+    // Calculate summary
+    const income = transactions
+        .filter(t => t.transactionType === "income")
+        .reduce((sum, t) => sum + t.amount, 0);
 
-//   const expenses = transactions
-//     .filter(t => t.transactionType === "expense")
-//     .reduce((sum, t) => sum + t.amount, 0);
+    const expenses = transactions
+        .filter(t => t.transactionType === "expense")
+        .reduce((sum, t) => sum + t.amount, 0);
 
-//   const net = income - expenses;
+    const net = income - expenses;
 
-//   // Category breakdown
-//   const categoryBreakdown = {};
-//   transactions.forEach(t => {
-//     if (!categoryBreakdown[t.category]) {
-//       categoryBreakdown[t.category] = { income: 0, expense: 0 };
-//     }
-//     if (t.transactionType === "income") {
-//       categoryBreakdown[t.category].income += t.amount;
-//     } else {
-//       categoryBreakdown[t.category].expense += t.amount;
-//     }
-//   });
+    // Category breakdown
+    const categoryBreakdown = {};
+    transactions.forEach(t => {
+        if (!categoryBreakdown[t.category]) {
+            categoryBreakdown[t.category] = { income: 0, expense: 0 };
+        }
+        if (t.transactionType === "income") {
+            categoryBreakdown[t.category].income += t.amount;
+        } else {
+            categoryBreakdown[t.category].expense += t.amount;
+        }
+    });
 
-//   res.status(200).json({
-//     success: true,
-//     summary: {
-//       period,
-//       income,
-//       expenses,
-//       net,
-//       transactionCount: transactions.length,
-//       categoryBreakdown
-//     }
-//   });
-// });
+    res.status(200).json({
+        success: true,
+        summary: {
+            period,
+            income,
+            expenses,
+            net,
+            transactionCount: transactions.length,
+            categoryBreakdown
+        }
+    });
+});
+
+
+
+export const searchTransactions = catchAsyncError(async (req, res, next) => {
+    const userId = req.user._id;
+    const { query } = req.query;
+    if (!query) {
+        return next(new ErrorHandler(400, "Please provide search query"));
+    }
+
+    const transactions = await Transaction.find({
+        user: userId,
+        $or: [
+            { title: { $regex: query, $options: "i" } },
+            { description: { $regex: query, $options: "i" } },
+            { subCategory: { $regex: query, $options: "i" } },
+            { tags: { $in: [new RegExp(query, "i")] } }
+        ]
+    }).sort({ date: -1 });
+
+    res.status(200).json({
+        success: true,
+        count: transactions.length,
+        transactions
+    });
+});
+
+export const bulkImportTransactions = catchAsyncError(async (req, res, next) => {
+    const userId = req.user._id;
+    const { transactions } = req.body;
+
+    if (!Array.isArray(transactions) || transactions.length === 0) {
+        return next(new ErrorHandler(400, "Please provide valid transactions array"));
+    }
+    const transactionsWithUser = transactions.map(t => ({
+        ...t,
+        user: userId
+    }));
+
+    const created = await Transaction.insertMany(transactionsWithUser);
+
+    res.status(201).json({
+        success: true,
+        message: `${created.length} transactions imported successfully`,
+        count: created.length
+    });
+});

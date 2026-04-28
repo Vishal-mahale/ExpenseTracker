@@ -34,6 +34,50 @@ export const userSchema = new mongoose.Schema({
             default: ""
         }
     },
+    currency: {
+        type: String,
+        enum: ["INR", "USD", "EUR", "GBP"],
+        default: "INR"
+    },
+    monthlyBudget: {
+        type: Number,
+        default: 0
+    },
+    savingsGoal: {
+        type: Number,
+        default: 0
+    },
+    savingsTarget: {
+        type: Date, // Target date for savings goal
+        default: null
+    },
+    preferredCategories: [{
+        type: String,
+        default: []
+    }],
+    twoFactorEnabled: {
+        type: Boolean,
+        default: false
+    },
+    notifications: {
+        emailAlerts: {
+            type: Boolean,
+            default: true
+        },
+        budgetExceeded: {
+            type: Boolean,
+            default: true
+        },
+        billReminder: {
+            type: Boolean,
+            default: true
+        }
+    },
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
+    verificationToken: String,
     resetPasswordToken: String,
     resetPasswordExperies: Date
 }, { timestamps: true })

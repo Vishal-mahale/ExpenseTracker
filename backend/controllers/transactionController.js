@@ -19,8 +19,8 @@ const categoryMap = {
 };
 
 export const createTransaction = catchAsyncError(async (req, res, next) => {
-    const userId = req.user._id    
-    const { title, amount, transactionType, category, subCategory, paymentMethod, date, description ,tags} = req.body
+    const userId = req.user._id
+    const { title, amount, transactionType, category, subCategory, paymentMethod, date, description, tags } = req.body
 
     if (!title || !amount || !transactionType || !category || !subCategory) {
         return next(new ErrorHandler("All required fields must be provided", 400))
@@ -83,6 +83,23 @@ export const getAllTransaction = catchAsyncError(async (req, res, next) => {
 });
 
 
+export const getTransactionById = catchAsyncError(async (req, res, next) => {
+    const { id } = req.params;
+    const userId = req.user._id;
+    const transaction = await Transaction.findById(id).populate("user");
+    if (!transaction) {
+        return next(new ErrorHandler(404, "Transaction not found"));
+    }
+    if (transaction.user._id.toString() !== userId.toString()) {
+        return next(new ErrorHandler(403, "Not authorized to view this transaction"));
+    }
+    res.status(200).json({
+        success: true,
+        transaction
+    });
+});
+
+
 //Updating transation
 export const updateTransaction = catchAsyncError(async (req, res, next) => {
     const userId = req.user._id;
@@ -110,18 +127,18 @@ export const updateTransaction = catchAsyncError(async (req, res, next) => {
 })
 
 export const deleteTransaction = catchAsyncError(async (req, res, next) => {
-  const { id } = req.params;
-  const userId = req.user._id;
-  const transaction = await Transaction.findById(id);
-  if (!transaction) {
-    return next(new ErrorHandler(404, "Transaction not found"));
-  }
-  if (transaction.user.toString() !== userId.toString()) {
-    return next(new ErrorHandler(403, "Not authorized to delete this transaction"));
-  }
-  await Transaction.findByIdAndDelete(id);
-  res.status(200).json({
-    success: true,
-    message: "Transaction deleted successfully"
-  });
+    const { id } = req.params;
+    const userId = req.user._id;
+    const transaction = await Transaction.findById(id);
+    if (!transaction) {
+        return next(new ErrorHandler(404, "Transaction not found"));
+    }
+    if (transaction.user.toString() !== userId.toString()) {
+        return next(new ErrorHandler(403, "Not authorized to delete this transaction"));
+    }
+    await Transaction.findByIdAndDelete(id);
+    res.status(200).json({
+        success: true,
+        message: "Transaction deleted successfully"
+    });
 });
