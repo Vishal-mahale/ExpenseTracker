@@ -5,7 +5,7 @@ import User from '../model/User.js'
 
 
 const categoryMap = {
-    "Income": ["Salary", "Odd jobs", "Pension", "Other"],
+    "Income": ["Salary", "Odd jobs", "Pension","Bussiness","Pocket Money", "Other"],
     "Food/Drinks": ["Eating out", "Bar"],
     "Shopping": ["Clothing", "Shoes", "Technology", "Gifts"],
     "Transportation": ["Car", "Fuel", "Insurance"],
@@ -28,6 +28,7 @@ export const createTransaction = catchAsyncError(async (req, res, next) => {
     if (amount < 0) {
         return next(new ErrorHandler("Amount must be greater than 0", 400))
     }
+    console.log(req.body)
     const transaction = await Transaction.create({
         user: userId,
         title,
@@ -51,6 +52,7 @@ export const getAllTransaction = catchAsyncError(async (req, res, next) => {
 
     const userId = req.user._id
     const { category, transactionType, paymentMethod, startDate, endDate, page = 1, limit = 10 } = req.query
+    // console.log(category, transactionType, paymentMethod, startDate, endDate, page, limit);
 
     // Building filter
     let filter = {
@@ -66,6 +68,10 @@ export const getAllTransaction = catchAsyncError(async (req, res, next) => {
     }
 
     const skip = (page - 1) * limit;
+
+    // console.log("userId:", userId);
+    // console.log("filter:", filter);
+
     const transactions = await Transaction.find(filter)
         .sort({ date: -1 })
         .skip(skip)

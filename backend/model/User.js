@@ -83,7 +83,7 @@ export const userSchema = new mongoose.Schema({
 }, { timestamps: true })
 
 
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
     if (!this.isModified("password")) {
         return;
     }
@@ -94,7 +94,7 @@ userSchema.pre("save", async function (next) {
 
 userSchema.methods.getWebToken = function () {
     return jwtToken.sign({ id: this._id }, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRES + 24 * 60 * 60 * 1000
+        expiresIn: process.env.JWT_EXPIRES
     })
 }
 
