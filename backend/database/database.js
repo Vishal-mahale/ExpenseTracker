@@ -11,3 +11,5 @@ export const connectDB = async () => {
         process.exit(1);
     }
 }
+
+// mongodb://27017:localhost/dbname

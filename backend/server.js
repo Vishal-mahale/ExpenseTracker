@@ -5,6 +5,8 @@ import { config } from 'dotenv';
 import cors from "cors";
 import multer from "multer";
 import cookieParser from "cookie-parser"
+import helmet from 'helmet'
+import rateLimit from 'express-rate-limit'
 
 import { connectDB } from "./database/database.js";
 import { cloudinaryConfig } from "./config/cloudinary.js";
@@ -14,10 +16,25 @@ import transactionRouter from "./routes/transactionRoute.js"
 import dashboardRouter from "./routes/dashboardRoute.js"
 import savingRouter from "./routes/savingRouter.js"
 import budgetRouter from "./routes/budgetRouter.js"
-import errorMiddleware from "./middlewares/error.js"
 import billRouter from "./routes/billRoute.js"
 
+import errorMiddleware from "./middlewares/error.js"
+
 const app = express();
+
+//Rate Limiting: Prevents brute-force and DDoS attacks
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    message: "Too many requests from this IP, please try again after 15 minutes",
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false,
+});
+
+app.use(helmet({
+  contentSecurityPolicy: false,
+}));
+app.use(limiter)
 app.use(express.json());
 app.use(cookieParser())
 
@@ -29,8 +46,8 @@ cloudinaryConfig();
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/transaction", transactionRouter)
 app.use("/api/v1/dsahboard", dashboardRouter);
-app.use("/api/v1/saving",savingRouter)
-app.use("/api/v1/budget",budgetRouter)
+app.use("/api/v1/saving", savingRouter)
+app.use("/api/v1/budget", budgetRouter)
 app.use("/api/v1/bills", billRouter)
 
 //Middleware foor error handling.

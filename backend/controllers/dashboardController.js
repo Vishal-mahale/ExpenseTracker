@@ -212,9 +212,7 @@ export const bulkImportTransactions = catchAsyncError(async (req, res, next) => 
         ...t,
         user: userId
     }));
-
     const created = await Transaction.insertMany(transactionsWithUser);
-
     res.status(201).json({
         success: true,
         message: `${created.length} transactions imported successfully`,
