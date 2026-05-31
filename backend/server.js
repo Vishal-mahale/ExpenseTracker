@@ -100,10 +100,11 @@ app.use(cookieParser());
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://expense-tracker-jet-gamma.vercel.app" // 🔁 update after frontend deploy
+    "https://expense-tracker-jet-gamma.vercel.app", // 🔁 update after frontend deploy
   ],
   credentials: true, // needed for cookies
   methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
 connectDB();

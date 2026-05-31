@@ -8,7 +8,10 @@ const getToken = (res, statusCode, user, message) => {
     const options = {
         expires: new Date(Date.now() + expiresMs),
         httpOnly: true,
+        sameSite: "none",
+        secure: true,
     };
+
     res.status(statusCode).cookie("token", token, options).json({
         success: true,
         message,
