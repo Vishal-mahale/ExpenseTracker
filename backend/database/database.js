@@ -13,3 +13,5 @@ export const connectDB = async () => {
 }
 
 // mongodb://27017:localhost/dbname
+
+export default connectDB;
