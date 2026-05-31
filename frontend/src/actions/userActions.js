@@ -33,11 +33,13 @@ export const login = (email, password) => async (dispatch) => {
         "Content-Type": "application/json",
       },
     };
+    console.log(email,password);
     const { data } = await axiosInstance.post(
       "/api/v1/user/login",
       { email, password },
       config
     );
+    console.log(data)
     dispatch({
       type: LOGIN_SUCCESS,
       payload: data.user,
@@ -85,7 +87,9 @@ export const registerUser = (user) => async (dispatch) => {
 export const loadUser = () => async (dispatch) => {
   dispatch({ type: LOAD_USER_REQUEST });
   try {
+    console.log(axiosInstance);
     const { data } = await axiosInstance.get("/api/v1/user/me");
+    console.log(data);
     dispatch({ type: LOAD_USER_SUCCESS, payload: data.user });
   } catch (error) {
     const errorMsg = error.response?.data?.message || error.message;

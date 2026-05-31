@@ -65,14 +65,17 @@ export const login = catchAsyncError(async (req, res, next) => {
   if (!email || !password) {
     return next(new ErrorHandler("Please enter email or password", 400));
   }
+
   const user = await User.findOne({ email }).select("+password");
   if (!user) {
     return next(new ErrorHandler("Please enter valid email or password", 401));
   }
+  
   const isPassMatch = await user.comparePassword(password);
   if (!isPassMatch) {
     return next(new ErrorHandler("Please enter valid email or password", 401));
   }
+  console.log("Please",isPassMatch);
   sendToken(res, 200, user, "Logged in successfully");
 });
 
