@@ -1,5 +1,5 @@
-import axios from "axios";
 import { toast } from "react-toastify";
+import axiosInstance from "../utils/axios";
 import {
   LOAD_USER_FAIL,
   LOAD_USER_REQUEST,
@@ -33,7 +33,7 @@ export const login = (email, password) => async (dispatch) => {
         "Content-Type": "application/json",
       },
     };
-    const { data } = await axios.post(
+    const { data } = await axiosInstance.post(
       "/api/v1/user/login",
       { email, password },
       config
@@ -65,7 +65,7 @@ export const registerUser = (user) => async (dispatch) => {
     const config = {
       withCredentials: true,
     };
-    const { data } = await axios.post("/api/v1/user/register", user, config);
+    const { data } = await axiosInstance.post("/api/v1/user/register", user, config);
     dispatch({
       type: "REGISTER_USER_SUCCESS",
       payload: data.user,
@@ -85,7 +85,7 @@ export const registerUser = (user) => async (dispatch) => {
 export const loadUser = () => async (dispatch) => {
   dispatch({ type: LOAD_USER_REQUEST });
   try {
-    const { data } = await axios.get("/api/v1/user/me");
+    const { data } = await axiosInstance.get("/api/v1/user/me");
     dispatch({ type: LOAD_USER_SUCCESS, payload: data.user });
   } catch (error) {
     const errorMsg = error.response?.data?.message || error.message;
@@ -95,7 +95,7 @@ export const loadUser = () => async (dispatch) => {
 
 export const logOut = () => async (dispatch) => {
   try {
-    await axios.get("/api/v1/user/logout");
+    await axiosInstance.get("/api/v1/user/logout");
     dispatch({ type: LOG_OUT_SUCCESS });
     toast.success("Logged out Successfully.");
   } catch (error) {
@@ -113,7 +113,7 @@ export const updateUser = (userData) => async (dispatch) => {
         "Content-Type": "multipart/form-data",
       },
     };
-    const { data } = await axios.put("/api/v1/me/update", userData, config);
+    const { data } = await axiosInstance.put("/api/v1/me/update", userData, config);
     dispatch({
       type: UPDATE_PROFILE_SUCCESS,
       payload: data.user,
@@ -139,7 +139,7 @@ export const updatePassword =
             "Content-Type": "application/json",
           },
         };
-        const { data } = await axios.put(
+        const { data } = await axiosInstance.put(
           "/api/v1/user/password/update",
           { currentPassword, newPassword, confirmPassword },
           config
@@ -167,7 +167,7 @@ export const forgotPassword = (email) => async (dispatch) => {
         "Content-Type": "application/json",
       },
     };
-    const { data } = await axios.post(
+    const { data } = await axiosInstance.post(
       "/api/v1/user/password/forgot",
       { email },
       config
@@ -194,7 +194,7 @@ export const resetPassword =
             "Content-Type": "application/json",
           },
         };
-        const { data } = await axios.put(
+        const { data } = await axiosInstance.put(
           `/api/v1/user/password/reset/${token}`,
           { password, confirmPassword },
           config
