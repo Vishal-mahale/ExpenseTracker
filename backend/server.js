@@ -84,11 +84,11 @@ if (process.env.NODE_ENV !== "production") {
 const app = express();
 
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-    message: "Too many requests from this IP, please try again after 15 minutes",
-    standardHeaders: true,
-    legacyHeaders: false,
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: "Too many requests from this IP, please try again after 15 minutes",
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 app.use(helmet({ contentSecurityPolicy: false }));
@@ -123,4 +123,9 @@ if (process.env.NODE_ENV !== "production") {
     console.log(`Server is running on port ${process.env.PORT}`);
   });
 }
+
+app.get('/', (req, res) => {
+  res.send('Hello World. How you doin.')
+})
+
 export default app; // ✅ Required for Vercel
