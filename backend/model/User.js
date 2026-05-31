@@ -84,12 +84,21 @@ export const userSchema = new mongoose.Schema({
 
 
 userSchema.pre("save", async function () {
-    if (!this.isModified("password")) {
-        return;
-    }
+    if (!this.isModified("password")) return;
     if (!this.password) return;
+    const isAlreadyHashed = this.password.startsWith("$2b$") || this.password.startsWith("$2a$");
+    if (isAlreadyHashed) return;
     this.password = await bcrypt.hash(this.password, 10);
 })
+
+
+// userSchema.pre("save", async function () {
+//     if (!this.isModified("password")) {
+//         return;
+//     }
+//     if (!this.password) return;
+//     this.password = await bcrypt.hash(this.password, 10);
+// })
 // Above function is an even on userSchema. It will get called before user data get saved.
 
 userSchema.methods.getWebToken = function () {
@@ -99,7 +108,11 @@ userSchema.methods.getWebToken = function () {
 }
 
 userSchema.methods.comparePassword = async function (enteredPassword) {
-    return await bcrypt.compare(enteredPassword, this.password)
+    console.log("enteredPassword", enteredPassword)
+    console.log("this.password", this.password)
+    const isMatch = await bcrypt.compare(enteredPassword, this.password)
+    console.log("isMatch", isMatch)
+    return isMatch
 }
 
 userSchema.methods.getResetToken = function () {
