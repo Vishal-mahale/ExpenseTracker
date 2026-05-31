@@ -1,4 +1,3 @@
-import axios from "axios";
 import {
   CREATE_TRANSACTION_REQUEST,
   CREATE_TRANSACTION_SUCCESS,
@@ -17,6 +16,7 @@ import {
   DELETE_TRANSACTION_FAIL,
   CLEAR_ERRORS,
 } from "../constants/transactionConstants";
+import axiosInstance from "../utils/axios";
 
 
 // ─── Create Transaction ───────────────────────────────────────────────────────
@@ -24,7 +24,7 @@ export const createTransaction = (transactionData) => async (dispatch) => {
   try {
     dispatch({ type: CREATE_TRANSACTION_REQUEST });
     console.log(transactionData)
-    const { data } = await axios.post("/api/v1/transaction/create", transactionData);
+    const { data } = await axiosInstance.post("/api/v1/transaction/create", transactionData);
     dispatch({
       type: CREATE_TRANSACTION_SUCCESS,
       payload: data.transaction,
@@ -62,7 +62,7 @@ export const getAllTransactions =
         params.append("page", page);
         params.append("limit", limit);
 
-        const { data } = await axios.get(
+        const { data } = await axiosInstance.get(
           `/api/v1/transaction/transactions?${params.toString()}`
         );
         console.log(data.transactions)
@@ -88,7 +88,7 @@ export const getAllTransactions =
 export const getTransactionById = (id) => async (dispatch) => {
   try {
     dispatch({ type: GET_TRANSACTION_DETAIL_REQUEST });
-    const { data } = await axios.get(`/api/v1/transaction/${id}`);
+    const { data } = await axiosInstance.get(`/api/v1/transaction/${id}`);
     dispatch({
       type: GET_TRANSACTION_DETAIL_SUCCESS,
       payload: data.transaction,
@@ -105,7 +105,7 @@ export const getTransactionById = (id) => async (dispatch) => {
 export const updateTransaction = (id, updateData) => async (dispatch) => {
   try {
     dispatch({ type: UPDATE_TRANSACTION_REQUEST });
-    const { data } = await axios.put(`/api/v1/transaction/${id}`, updateData);
+    const { data } = await axiosInstance.put(`/api/v1/transaction/${id}`, updateData);
     dispatch({
       type: UPDATE_TRANSACTION_SUCCESS,
       payload: data.transaction,
@@ -122,7 +122,7 @@ export const updateTransaction = (id, updateData) => async (dispatch) => {
 export const deleteTransaction = (id) => async (dispatch) => {
   try {
     dispatch({ type: DELETE_TRANSACTION_REQUEST });
-    await axios.delete(`/api/v1/transaction/${id}`);
+    await axiosInstance.delete(`/api/v1/transaction/${id}`);
     dispatch({
       type: DELETE_TRANSACTION_SUCCESS,
       payload: id,
